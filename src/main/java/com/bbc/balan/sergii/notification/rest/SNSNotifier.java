@@ -9,7 +9,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 @Path("/notify")
 public class SNSNotifier {
@@ -21,13 +23,27 @@ public class SNSNotifier {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response doNotify(String jsonRequest) {
 
-		JsonParser parser = new JsonParser();
-		JsonObject obj = parser.parse(jsonRequest).getAsJsonObject();
-		String value = obj.get("message").toString();
+		String output = "SNS says: ";
+		int status = 200;
 		
-		String output = "SNS says: " + value;
+		try {
+			JsonParser parser = new JsonParser();
+			JsonObject obj = parser.parse(jsonRequest).getAsJsonObject();
+			String value = obj.get("message").toString();
+			
+			output += value;
+		}
+		catch(JsonSyntaxException e) {
+			output += "Json syntax error";
+			status = 500;
+		}
+		catch(JsonParseException e) {
+			output += "Json parse error";
+			status = 500;
+		}
+
 	
-		return Response.status(200).entity(output).build();
+		return Response.status(status).entity(output).build();
 		 
 	}		
 	
