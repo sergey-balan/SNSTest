@@ -1,5 +1,7 @@
 package com.bbc.balan.sergii.notification.rest;
 
+import java.io.IOException;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -8,6 +10,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.bbc.balan.sergii.notification.sns.SNSPushGenerator;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
@@ -30,6 +33,14 @@ public class SNSNotifier {
 			JsonParser parser = new JsonParser();
 			JsonObject obj = parser.parse(jsonRequest).getAsJsonObject();
 			String value = obj.get("message").toString();
+			
+
+				try {
+					SNSPushGenerator.push(value);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			
 			output += value;
 		}
